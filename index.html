@@ -147,6 +147,8 @@
             border-radius: 5px;
             cursor: pointer;
             transition: background 0.3s ease;
+            position: sticky;
+            bottom: 10px;
         }
         .home-button:hover {
             background: #555;
@@ -282,6 +284,15 @@
                 right: 10px;
                 top: 5px;
                 font-size: 30px;
+            }
+            .home-button {
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: 1001;
+                width: 80%;
+                max-width: 200px;
             }
         }
 
