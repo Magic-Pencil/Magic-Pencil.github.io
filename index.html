@@ -112,6 +112,8 @@
             background: white;
             padding: 15px;
             border-radius: 8px;
+            overflow-y: auto;
+            position: relative;
         }
         .modal-image {
             flex: 1;
@@ -119,11 +121,14 @@
             display: flex;
             align-items: center;
             margin-bottom: 15px;
+            position: relative;
         }
         .modal-image img {
             width: 100%;
-            height: 100%;
+            height: auto;
+            max-height: 50vh;
             object-fit: contain;
+            transition: transform 0.3s ease;
         }
         .modal-description {
             padding: 0 15px;
@@ -137,6 +142,34 @@
             color: #fff;
             font-size: 35px;
             cursor: pointer;
+        }
+        .back-button {
+            position: absolute;
+            left: 15px;
+            top: 10px;
+            background: #000;
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+        }
+        .zoom-controls {
+            position: absolute;
+            right: 15px;
+            bottom: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        .zoom-btn {
+            background: #000;
+            color: #fff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
         }
         footer {
             text-align: center;
@@ -184,12 +217,43 @@
                 gap: 10px;
                 padding: 10px;
             }
+            .modal-content {
+                width: 95%;
+                height: auto;
+                max-height: 90vh;
+                margin: 10px;
+                padding: 10px;
+            }
+            .modal-image img {
+                max-height: 40vh;
+            }
+            .modal-description {
+                max-height: 30vh;
+                font-size: 14px;
+            }
+            .close {
+                right: 10px;
+                top: 5px;
+                font-size: 30px;
+            }
         }
 
         @media screen and (max-width: 400px) {
             header {
                 font-size: 14px;
                 letter-spacing: 1px;
+            }
+            .modal-content {
+                margin: 5px;
+                padding: 8px;
+            }
+            .modal-image img {
+                max-height: 35vh;
+            }
+            .modal-description {
+                max-height: 25vh;
+                font-size: 13px;
+                padding: 0 10px;
             }
         }
     </style>
@@ -227,9 +291,14 @@
 
     <div id="imageModal" class="modal">
         <span class="close" onclick="closeModal()">&times;</span>
+        <button class="back-button" onclick="closeModal()">Back</button>
         <div class="modal-content">
             <div class="modal-image">
                 <img id="modalImg" src="" alt="Enlarged portfolio image">
+                <div class="zoom-controls">
+                    <button class="zoom-btn" onclick="zoomIn()">+</button>
+                    <button class="zoom-btn" onclick="zoomOut()">-</button>
+                </div>
             </div>
             <div class="modal-description">
                 <h2>Description</h2>
@@ -241,6 +310,8 @@
     <footer>Arts by Janindu &copy;</footer>
 
     <script>
+        let currentZoom = 1;
+        
         function openModal(imgSrc, description) {
             const modal = document.getElementById('imageModal');
             const modalImg = document.getElementById('modalImg');
@@ -249,10 +320,26 @@
             modal.style.display = "block";
             modalImg.src = imgSrc;
             modalDesc.textContent = description;
+            currentZoom = 1;
+            modalImg.style.transform = `scale(${currentZoom})`;
         }
 
         function closeModal() {
             document.getElementById('imageModal').style.display = "none";
+        }
+
+        function zoomIn() {
+            if (currentZoom < 3) {
+                currentZoom += 0.2;
+                document.getElementById('modalImg').style.transform = `scale(${currentZoom})`;
+            }
+        }
+
+        function zoomOut() {
+            if (currentZoom > 0.5) {
+                currentZoom -= 0.2;
+                document.getElementById('modalImg').style.transform = `scale(${currentZoom})`;
+            }
         }
     </script>
 </body>
