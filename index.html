@@ -167,20 +167,29 @@
                 padding: 10px;
             }
             header {
-                font-size: 18px;
-                letter-spacing: 3px;
+                font-size: 16px;
+                letter-spacing: 2px;
                 padding: 15px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            .instagram-link, .cv-link {
+                position: static;
+                margin: 5px;
             }
             .portfolio-grid {
                 grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
                 gap: 10px;
                 padding: 10px;
             }
-            .instagram-link {
-                right: 50px;
-            }
-            .cv-link {
-                right: 10px;
+        }
+
+        @media screen and (max-width: 400px) {
+            header {
+                font-size: 14px;
+                letter-spacing: 1px;
             }
         }
     </style>
