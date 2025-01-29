@@ -424,12 +424,17 @@
             modalImg.src = imgSrc;
             modalDesc.textContent = description;
             
+            // Check if likes exist in localStorage, if not initialize
+            if (!localStorage.getItem('imageLikes')) {
+                localStorage.setItem('imageLikes', JSON.stringify({}));
+            }
+            
             // Load likes from localStorage
-            const likes = JSON.parse(localStorage.getItem('imageLikes')) || {};
+            const likes = JSON.parse(localStorage.getItem('imageLikes'));
             likeCount.textContent = likes[currentImageId] || 0;
             
-            // Update like button appearance
-            const userLikes = JSON.parse(localStorage.getItem('userLikes')) || {};
+            // Check if user has liked this image before
+            const userLikes = JSON.parse(localStorage.getItem('userLikes') || '{}');
             if (userLikes[currentImageId]) {
                 likeButton.classList.add('liked');
             } else {
@@ -461,19 +466,19 @@
             const likeCount = document.getElementById('likeCount');
             
             // Get stored likes
-            const likes = JSON.parse(localStorage.getItem('imageLikes')) || {};
-            const userLikes = JSON.parse(localStorage.getItem('userLikes')) || {};
+            let likes = JSON.parse(localStorage.getItem('imageLikes')) || {};
+            let userLikes = JSON.parse(localStorage.getItem('userLikes')) || {};
             
-            if (userLikes[currentImageId]) {
-                // Unlike
-                likes[currentImageId] = (likes[currentImageId] || 1) - 1;
-                userLikes[currentImageId] = false;
-                likeButton.classList.remove('liked');
-            } else {
+            if (!userLikes[currentImageId]) {
                 // Like
                 likes[currentImageId] = (likes[currentImageId] || 0) + 1;
                 userLikes[currentImageId] = true;
                 likeButton.classList.add('liked');
+            } else {
+                // Unlike
+                likes[currentImageId] = Math.max((likes[currentImageId] || 0) - 1, 0);
+                userLikes[currentImageId] = false;
+                likeButton.classList.remove('liked');
             }
             
             // Update display
@@ -482,6 +487,14 @@
             // Save to localStorage
             localStorage.setItem('imageLikes', JSON.stringify(likes));
             localStorage.setItem('userLikes', JSON.stringify(userLikes));
+        }
+
+        // Initialize likes in localStorage if not exists
+        if (!localStorage.getItem('imageLikes')) {
+            localStorage.setItem('imageLikes', JSON.stringify({}));
+        }
+        if (!localStorage.getItem('userLikes')) {
+            localStorage.setItem('userLikes', JSON.stringify({}));
         }
     </script>
 </body>
