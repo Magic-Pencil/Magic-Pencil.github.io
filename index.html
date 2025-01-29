@@ -411,6 +411,16 @@
     <script>
         let currentImageId = '';
         
+        // Create WebSocket connection
+        const ws = new WebSocket('ws://' + window.location.host);
+        
+        ws.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            if (data.type === 'like_update') {
+                updateLikeCount(data.imageId, data.likes);
+            }
+        };
+        
         function openModal(imgSrc, description, imageId) {
             const modal = document.getElementById('imageModal');
             const modalImg = document.getElementById('modalImg');
@@ -424,16 +434,13 @@
             modalImg.src = imgSrc;
             modalDesc.textContent = description;
             
-            // Check if likes exist in localStorage, if not initialize
-            if (!localStorage.getItem('imageLikes')) {
-                localStorage.setItem('imageLikes', JSON.stringify({}));
-            }
+            // Request current likes from server
+            ws.send(JSON.stringify({
+                type: 'get_likes',
+                imageId: currentImageId
+            }));
             
-            // Load likes from localStorage
-            const likes = JSON.parse(localStorage.getItem('imageLikes'));
-            likeCount.textContent = likes[currentImageId] || 0;
-            
-            // Check if user has liked this image before
+            // Check if user has liked this image
             const userLikes = JSON.parse(localStorage.getItem('userLikes') || '{}');
             if (userLikes[currentImageId]) {
                 likeButton.classList.add('liked');
@@ -463,36 +470,35 @@
             if (!currentImageId) return;
             
             const likeButton = document.getElementById('likeButton');
-            const likeCount = document.getElementById('likeCount');
-            
-            // Get stored likes
-            let likes = JSON.parse(localStorage.getItem('imageLikes')) || {};
-            let userLikes = JSON.parse(localStorage.getItem('userLikes')) || {};
+            const userLikes = JSON.parse(localStorage.getItem('userLikes') || '{}');
             
             if (!userLikes[currentImageId]) {
                 // Like
-                likes[currentImageId] = (likes[currentImageId] || 0) + 1;
                 userLikes[currentImageId] = true;
                 likeButton.classList.add('liked');
             } else {
                 // Unlike
-                likes[currentImageId] = Math.max((likes[currentImageId] || 0) - 1, 0);
                 userLikes[currentImageId] = false;
                 likeButton.classList.remove('liked');
             }
             
-            // Update display
-            likeCount.textContent = likes[currentImageId];
+            // Send like/unlike to server
+            ws.send(JSON.stringify({
+                type: 'toggle_like',
+                imageId: currentImageId,
+                action: userLikes[currentImageId] ? 'like' : 'unlike'
+            }));
             
-            // Save to localStorage
-            localStorage.setItem('imageLikes', JSON.stringify(likes));
             localStorage.setItem('userLikes', JSON.stringify(userLikes));
         }
-
-        // Initialize likes in localStorage if not exists
-        if (!localStorage.getItem('imageLikes')) {
-            localStorage.setItem('imageLikes', JSON.stringify({}));
+        
+        function updateLikeCount(imageId, count) {
+            if (imageId === currentImageId) {
+                document.getElementById('likeCount').textContent = count;
+            }
         }
+
+        // Initialize userLikes in localStorage if not exists
         if (!localStorage.getItem('userLikes')) {
             localStorage.setItem('userLikes', JSON.stringify({}));
         }
